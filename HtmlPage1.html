@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.1.1.js"></script>
+    <script src="Scripts/knockout-3.4.2.js"></script>
+    <script>
+    
+        $(document).ready(function () {
+
+            //$body = $("body");
+
+            //$(document).on({
+            //    ajaxStart: function () { $("#waitgif").show(); },
+            //    ajaxStop: function () { $("#waitgif").hide(); }
+            //});
+           
+
+            $("#waitgif").hide();
+            var app = ko.observableArray();
+            app.push({ name: "pollo" ,id:"1"});
+            app.push({ name: "cup", id: "1" })
+            app.push({ name: "pubu", id: "1" })
+           
+            $("#btn2").click(function () {
+                $(this).hide();
+               
+                $.ajax({
+
+                    
+                    url: "http://localhost:57106/api/person/2",
+
+                    beforeSend:function () {
+                        $("#waitgif").fadeToggle();
+                    },
+                    success: function (result,status,xhr) {
+                        
+
+                        app.removeAll();
+                        $.each(result, function (index, value) {
+                            app.push({ name: value.Name, id: value.Id });
+                        })
+                       
+                       
+                        console.log(xhr.getResponseHeader("X-Total"));
+                        $("#btn2").show();
+                       
+                    },
+                    complete:function () {
+                        $("#waitgif").fadeToggle();
+                    },
+                    error: function () {
+                        alert("err");
+                    }
+                })
+            })
+
+            $("#btn").click(function () {
+               
+                $.ajax({
+
+                    url: "http://localhost:57106/api/person/1",
+                    success: function (result) {
+                        app.removeAll();
+                        $.each(result, function (index, value) {
+                            app.push({name:value.Name,id:value.Id})
+                        })
+
+                    },
+                    error: function () {
+                        alert("err");
+                    }
+                })
+            })
+
+
+
+            var viewModel = {
+                people: app
+            }
+            ko.applyBindings(viewModel);
+        })
+    </script>
+</head>
+<body>
+    <h4>People</h4>
+  
+       
+        <img id="waitgif" src="wi.gif" />
+   
+   
+    <ul data-bind="foreach: people">
+        <li>
+            Name at position <span data-bind="text: id"> </span>:
+            <span data-bind="text: name"> </span>
+            <span style="display:none" data-bind="text: name"> </span>
+
+        </li>
+    </ul>
+    <button id="btn">Uno</button>
+    <button id="btn2">dos</button>
+
+</body>
+</html>
